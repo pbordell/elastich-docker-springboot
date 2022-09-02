@@ -1,0 +1,32 @@
+  input {
+    jdbc {
+    jdbc_driver_library => "/home/dario/logstash/ojdbc7.jar"
+    jdbc_driver_class => "Java::oracle.jdbc.driver.OracleDriver"
+    jdbc_connection_string => "jdbc:oracle:thin:@oracledes2.a11.altran.es:1521:DESorcl2"
+    jdbc_user => "1671_SOCEXT"
+    jdbc_password => "1671_SOCEXT"
+    jdbc_paging_enabled => true
+    tracking_column => "unix_ts_in_secs"
+    use_column_value => true
+    tracking_column_type => "timestamp"
+    schedule => "*/30 * * * * *"
+    statement => "SELECT S.*, S.DATA_MODIFICACIO AS unix_ts_in_secs FROM SESSIO S WHERE (S.DATA_MODIFICACIO > :sql_last_value AND S.DATA_MODIFICACIO < SYSDATE) ORDER BY S.DATA_MODIFICACIO ASC"
+    lowercase_column_names => true
+    }
+  }
+    filter {
+    mutate {
+    copy => { "id" => "[@metadata][_id]"}
+    remove_field => ["id", "@version", "unix_ts_in_secs"]
+    }
+  }
+
+    output {
+    elasticsearch {
+    id => "esoutput"
+    hosts => "elasticsearch-74.db.dev.ctti.altran.kas:80"
+    document_id => "%{[@metadata][_id]}"
+    index => "sessio"
+    ilm_enabled => false
+    }
+  }

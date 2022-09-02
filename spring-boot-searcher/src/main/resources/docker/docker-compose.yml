@@ -1,0 +1,33 @@
+version: '2.2'
+
+services:
+  app:
+    build: ./app/
+    depends_on:
+      elastic:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - ELASTIC_HOST=elasticsearch-network
+      - ELASTIC_PORT=9200
+      - USER_NAME=galileu
+      - USER_PASSWORD=galileu
+      - SERVER_PORT=8002
+      - PERSISTENCE_WS_URL=localhost:8001
+      - PERSISTENCE_WS_USER=galileu
+      - PERSISTENCE_WS_PASSWORD=galileu
+
+  elastic:
+    image: elasticsearch:7.5.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      default:
+        aliases:
+          - elasticsearch-network
+    environment:
+      - discovery.type=single-node
+    healthcheck:
+      test: [ "CMD","curl","-f","http://localhost:9200/_cat/health" ]

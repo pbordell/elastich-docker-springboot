@@ -1,0 +1,20 @@
+include:
+  - project: 'devops/gitlab-pipelines'
+    ref:     'galileu'
+    file:    'maven.yml'
+
+variables:
+  JDK_VERSION: "11"
+  MAVEN_VERSION: "3"
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  extends: .maven-build
+
+test:
+  stage: test
+  extends: .maven-test
