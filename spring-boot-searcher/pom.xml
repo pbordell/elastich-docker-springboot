@@ -10,11 +10,11 @@
     <relativePath/>
   </parent>
 
-  <groupId>com.altran</groupId>
-  <artifactId>galileu-searcher</artifactId>
+  <groupId>com.pbs</groupId>
+  <artifactId>searcher</artifactId>
   <version>0.0.14</version>
   <name>galileu-searcher</name>
-  <description>Search Engine for Galileu App</description>
+  <description>Search App</description>
   <packaging>war</packaging>
 
   <properties>
@@ -134,20 +134,6 @@
       <artifactId>powermock-module-junit4</artifactId>
       <version>${powermock.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.altran</groupId>
-      <artifactId>galileu-commons</artifactId>
-      <version>${com.altran.commons}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-registry-prometheus</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.github.mweirauch</groupId>
-      <artifactId>micrometer-jvm-extras</artifactId>
-      <version>${micrometer.jvm.extras.version}</version>
-    </dependency>
   </dependencies>
 
   <build>
@@ -243,57 +229,7 @@
         <artifactId>sonar-maven-plugin</artifactId>
         <version>${sonar.maven.version}</version>
       </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${org.jacoco.version}</version>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>post-unit-test</id>
-            <phase>test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <!--
-               Sets the path to the file which contains the execution data.
-              -->
-              <dataFile>target/jacoco.exec</dataFile>
-              <!--
-               Sets the output directory for the code coverage report.
-              -->
-              <outputDirectory>target/jacoco-ut</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.gmavenplus</groupId>
-        <artifactId>gmavenplus-plugin</artifactId>
-        <version>${gmavenplus.plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>addTestSources</goal>
-              <goal>compileTests</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
     </plugins>
   </build>
 
