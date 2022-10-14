@@ -1,29 +1,12 @@
-/*
- * Copyright (c) 2016 Generalitat de Catalunya.
- *
- * The contents of this file may be used under the terms of the EUPL, Version 1.1 or - as soon they will be approved by
- * the European Commission - subsequent versions of the EUPL (the "Licence");
- *
- * You may not use this work except in compliance with the Licence. You may obtain a copy of the Licence at:
- * http://www.osor.eu/eupl/european-union-public-licence-eupl-v.1.1
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on
- * an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
- * See the Licence for the specific language governing permissions and limitations under the Licence.
- *
- * Original authors: Centre de Suport Canigó Contact: oficina-tecnica.canigo.ctti@gencat.cat
- */
+package com.pbs.searcher.rest.controller;
 
-package com.altran.galileu.rest.controller;
-
-import com.altran.galileu.config.Constants;
-import com.altran.galileu.dto.searcher.SearcherDocument;
-import com.altran.galileu.dto.searcher.SearcherQuery;
-import com.altran.galileu.rest.client.ElasticClient;
-import com.altran.galileu.rest.entity.ResponsePage;
-import com.altran.galileu.rest.entity.ResponsePageScroll;
-import com.altran.galileu.util.WsUtil;
+import com.pbs.searcher.config.Constants;
+import com.pbs.searcher.rest.client.ElasticClient;
+import com.pbs.searcher.rest.entity.ResponsePage;
+import com.pbs.searcher.rest.entity.ResponsePageScroll;
+import com.pbs.searcher.util.SearcherDocument;
+import com.pbs.searcher.util.SearcherQuery;
+import com.pbs.searcher.util.WsUtil;
 import io.swagger.annotations.ApiOperation;
 import org.elasticsearch.action.get.GetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +31,8 @@ import java.util.List;
 @RequestMapping("/api/es")
 public class SearcherController {
 
-  @Autowired ElasticClient elasticClient;
+  @Autowired
+  private ElasticClient elasticClient;
 
   @ApiOperation(value = "Read an object on specific index and ID")
   @GetMapping("/{index}/{documentId}/{version}")
