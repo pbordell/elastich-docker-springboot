@@ -1,6 +1,6 @@
 # Microservice users
 ## Description
-This project is a dockerized ELK stack for Galileu use 
+This project is a dockerized ELK stack for consuming application 
 
 ## Getting started
 ### Prerequisites
@@ -9,7 +9,7 @@ This project is a dockerized ELK stack for Galileu use
 
 ### Running 
 # Create network
-docker network create observabilitysandbox
+docker network
 # Run docker compose
 docker-compose up
 
