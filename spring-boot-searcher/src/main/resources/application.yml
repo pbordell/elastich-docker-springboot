@@ -1,51 +1,9 @@
-spring:
-  mvc:
-    locale: ca
-  jackson:
-    default-property-inclusion: non_null
-  messages:
-    encoding: UTF-8
-
-management:
-  endpoint:
-    shutdown:
-      enabled: false
-    health:
-      show-details: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  endpoints:
-    web:
-      base-path: /api
-      exposure:
-        include: "*"
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: ${spring.application.id}
-    distribution:
-      percentiles-histogram:
-        http.server:
-          requests: true
-      slo:
-        http:
-          server:
-            requests: 50ms, 100ms, 200ms, 400ms
-      percentiles:
-        http:
-          server:
-            requests: 0.5, 0.9, 0.95, 0.99, 0.999
-
 elasticsearch:
   port: ${ELASTIC_PORT}
   host: ${ELASTIC_HOST}
   user: ${ELASTIC_USER:}
   password: ${ELASTIC_PASSWORD:}
-  ssl: ${ELASTIC_SSL:true}
+  ssl: ${ELASTIC_SSL:false}
   client:
     timeout: 2500
   socket:
