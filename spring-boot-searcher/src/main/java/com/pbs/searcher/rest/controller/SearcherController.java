@@ -2,11 +2,11 @@ package com.pbs.searcher.rest.controller;
 
 import com.pbs.searcher.config.Constants;
 import com.pbs.searcher.rest.client.ElasticClient;
+import com.pbs.searcher.rest.entity.Data;
 import com.pbs.searcher.rest.entity.ResponsePage;
 import com.pbs.searcher.rest.entity.ResponsePageScroll;
 import com.pbs.searcher.util.SearcherDocument;
 import com.pbs.searcher.util.SearcherQuery;
-import com.pbs.searcher.util.WsUtil;
 import io.swagger.annotations.ApiOperation;
 import org.elasticsearch.action.get.GetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,22 @@ public class SearcherController {
       List<Object> included = new ArrayList<>();
       included.add(getResponse.getSourceAsMap());
       return new ResponseEntity<>(
-          WsUtil.getResponsePage(included, Constants.UN, Constants.UN, Constants.UN),
+          getResponsePage(included, Constants.UN, Constants.UN, Constants.UN),
           HttpStatus.ACCEPTED);
     } else {
       return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
+  }
+
+  private ResponsePage getResponsePage(List<Object> included, int limit, int total,
+                                             int numberOfElements) {
+    ResponsePage result = new ResponsePage();
+    Data data = new Data();
+    data.setIncluded(included);
+    data.setLimit(limit);
+    data.setTotal(total);
+    data.setNumberOfElements(numberOfElements);
+    return result;
   }
 
   @ApiOperation(value = "List all index created")

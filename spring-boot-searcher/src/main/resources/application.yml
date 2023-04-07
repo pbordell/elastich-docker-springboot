@@ -1,6 +1,6 @@
 elasticsearch:
-  port: ${ELASTIC_PORT}
-  host: ${ELASTIC_HOST}
+  port: 9200
+  host: localhost
   user: ${ELASTIC_USER:}
   password: ${ELASTIC_PASSWORD:}
   ssl: ${ELASTIC_SSL:false}

@@ -74,6 +74,19 @@ services:
     labels:
       org.label-schema.group: "observability"
 
+  searcher:
+    build: spring-boot-searcher/
+    depends_on:
+      elastic:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - ELASTIC_HOST=elasticsearch-network
+      - ELASTIC_PORT=9200
+      - USER_NAME=
+      - USER_PASSWORD=
+
 volumes:
   elasticsearch:
 

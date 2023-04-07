@@ -54,9 +54,9 @@ import java.util.Map;
 @Component
 public class ElasticClient {
 
-  @Autowired RestHighLevelClient client;
+  @Autowired private RestHighLevelClient client;
 
-  @Autowired ObjectMapper mapper;
+  @Autowired private ObjectMapper mapper;
 
   public Map listIndexes() throws IOException {
     Map indexCount = new HashMap();
