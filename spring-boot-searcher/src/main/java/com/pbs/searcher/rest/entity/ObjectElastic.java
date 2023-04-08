@@ -1,4 +1,4 @@
-package com.pbs.searcher.util;
+package com.pbs.searcher.rest.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearcherDocument {
+public class ObjectElastic {
 
   private String id;
 

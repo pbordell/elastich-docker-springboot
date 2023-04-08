@@ -1,6 +1,8 @@
 package com.pbs.searcher.util;
 
 import java.util.Optional;
+
+import com.pbs.searcher.elasticQuery.*;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.*;
 

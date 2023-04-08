@@ -77,15 +77,14 @@ services:
   searcher:
     build: spring-boot-searcher/
     depends_on:
-      elastic:
-        condition: service_healthy
+      - elasticsearch
     ports:
       - "8080:8080"
     environment:
-      - ELASTIC_HOST=elasticsearch-network
+      - ELASTIC_HOST=localhost
       - ELASTIC_PORT=9200
-      - USER_NAME=
-      - USER_PASSWORD=
+      - USER_NAME=elastic
+      - USER_PASSWORD=octo
 
 volumes:
   elasticsearch:
@@ -93,4 +92,4 @@ volumes:
 networks:
   observabilitysandbox:
     name: observabilitysandbox
-    external: true
+    external: false

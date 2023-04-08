@@ -2,13 +2,12 @@ package com.pbs.searcher.rest.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pbs.searcher.config.Constants;
 import com.pbs.searcher.rest.entity.Data;
 import com.pbs.searcher.rest.entity.ResponsePage;
 import com.pbs.searcher.rest.entity.ResponsePageScroll;
 import com.pbs.searcher.util.QueryBuilderUtil;
-import com.pbs.searcher.util.SearcherDocument;
-import com.pbs.searcher.util.SearcherQuery;
+import com.pbs.searcher.rest.entity.ObjectElastic;
+import com.pbs.searcher.elasticQuery.SearcherQuery;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -67,15 +66,14 @@ public class ElasticClient {
     String[] indexes = client.indices().get(getIndexRequest, RequestOptions.DEFAULT).getIndices();
     for (String index : indexes) {
       indexCount.put(index, count(index, null));
-
     }
     return indexCount;
   }
 
-  public GetResponse findOne(String index, String documentId, Integer version) {
+  public GetResponse findOne(String index, String objectElasticId, Integer version) {
     GetResponse getResponse = null;
     try {
-      GetRequest request = new GetRequest(index, documentId);
+      GetRequest request = new GetRequest(index, objectElasticId);
       if (null != version) {
         request.version(version);
       }
@@ -91,12 +89,11 @@ public class ElasticClient {
 
   public ResponsePage search(
       String index, Integer limit, Integer offset, String sort, SearcherQuery searcherQuery) {
-    SearchResponse seachResponse;
     ResponsePage responsePage = new ResponsePage();
     try {
       SearchRequest searchRequest = getSearchRequest(index, limit, offset, sort, searcherQuery);
 
-      seachResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+      SearchResponse seachResponse = client.search(searchRequest, RequestOptions.DEFAULT);
       getResponsePage(limit, offset, seachResponse, responsePage);
     } catch (ElasticsearchException exception) {
       log.error(exception);
@@ -109,8 +106,8 @@ public class ElasticClient {
   public ResponsePageScroll searchScroll(
       String index, Integer limit, String sort, String scrollId, SearcherQuery searcherQuery) {
     ResponsePageScroll responsePageScroll = new ResponsePageScroll();
-    SearchResponse searchResponse;
     try {
+      SearchResponse searchResponse;
       if (null != scrollId) {
         SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
         scrollRequest.scroll(TimeValue.timeValueSeconds(30));
@@ -135,9 +132,9 @@ public class ElasticClient {
   }
 
   public boolean deleteScrollContext(String scrollId) {
-    ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
     ClearScrollResponse clearScrollResponse = null;
     try {
+      ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
       if (null != scrollId) {
         clearScrollRequest.addScrollId(scrollId);
       }
@@ -148,12 +145,12 @@ public class ElasticClient {
     return clearScrollResponse != null && clearScrollResponse.isSucceeded();
   }
 
-  public boolean putOne(String index, SearcherDocument searcherDocument) {
+  public boolean putOne(String index, ObjectElastic objectElastic) {
     IndexResponse indexResponse = null;
     try {
-      if (null != searcherDocument) {
+      if (null != objectElastic) {
         IndexRequest indexRequest =
-            getIndexRequestByObject(index, searcherDocument.getId(), searcherDocument.getContent());
+            getIndexRequestByObject(index, objectElastic.getId(), objectElastic.getContent());
         indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
       }
     } catch (ElasticsearchException exception) {
@@ -161,54 +158,48 @@ public class ElasticClient {
     } catch (IOException ioException) {
       log.error(ioException);
     }
-    log.info(indexResponse.status());
     return (indexResponse != null && (RestStatus.OK.equals(indexResponse.status()))
         || RestStatus.CREATED.equals(indexResponse.status()));
   }
 
-  private IndexRequest getIndexRequestByObject(String index, String documentId, Object object) {
+  private IndexRequest getIndexRequestByObject(String index, String objectElasticId, Object object) {
     IndexRequest indexRequest = null;
     try {
       String json = mapper.writeValueAsString(object);
-      indexRequest = new IndexRequest(index).id(documentId).source(json, XContentType.JSON);
+      indexRequest = new IndexRequest(index).id(objectElasticId).source(json, XContentType.JSON);
     } catch (JsonProcessingException e) {
-      log.error(e.getMessage());
+      log.error(e);
     }
     return indexRequest;
   }
 
-  public boolean putAll(String index, List<SearcherDocument> searcherDocumentLists) {
-    boolean result = Boolean.FALSE;
-    BulkRequest bulkRequest = new BulkRequest();
-    BulkResponse bulkResponse;
-    if (!existIndex(index)) {
-      createIndex(index);
-    }
-    searcherDocumentLists.forEach(
-        searcherBulkRequest ->
-            bulkRequest.add(
-                getIndexRequestByObject(
-                    index, searcherBulkRequest.getId(), searcherBulkRequest.getContent())));
-    bulkRequest.timeout(TimeValue.timeValueMinutes(4));
+  public boolean putAll(String index, List<ObjectElastic> lObjectsElastic) {
     try {
-      bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
-      result = !bulkResponse.hasFailures();
-      if (bulkResponse.hasFailures()) {
-        log.error(bulkResponse.buildFailureMessage());
+      if (!existIndex(index)) {
+        createIndex(index);
       }
+      BulkRequest bulkRequest = new BulkRequest();
+      lObjectsElastic.forEach(
+              searcherBulkRequest ->
+                      bulkRequest.add(
+                              getIndexRequestByObject(
+                                      index, searcherBulkRequest.getId(), searcherBulkRequest.getContent())));
+      bulkRequest.timeout(TimeValue.timeValueMinutes(4));
+
+      BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+      return !bulkResponse.hasFailures();
     } catch (ElasticsearchException exception) {
       log.error(exception);
     } catch (IOException ioException) {
       log.error(ioException);
     }
-    return result;
+    return Boolean.TRUE;
   }
 
-  public boolean deleteOne(String index, String documentId) {
-    DeleteResponse deleteResponse;
+  public boolean deleteOne(String index, String objectElasticId) {
     try {
-      DeleteRequest request = new DeleteRequest(index, documentId);
-      deleteResponse = client.delete(request, RequestOptions.DEFAULT);
+      DeleteRequest request = new DeleteRequest(index, objectElasticId);
+      DeleteResponse deleteResponse = client.delete(request, RequestOptions.DEFAULT);
       if (null != deleteResponse && RestStatus.NOT_FOUND != deleteResponse.status()) {
         return true;
       }
@@ -241,33 +232,31 @@ public class ElasticClient {
   }
 
   private boolean existIndex(String index) {
-    boolean result = Boolean.FALSE;
     try {
       GetIndexRequest request = new GetIndexRequest(index);
-      result = client.indices().exists(request, RequestOptions.DEFAULT);
+      return client.indices().exists(request, RequestOptions.DEFAULT);
     } catch (ElasticsearchException exception) {
       log.error(exception);
     } catch (IOException ioException) {
       log.error(ioException);
     }
-    return result;
+    return Boolean.FALSE;
   }
 
   public boolean createIndex(String index) {
-    boolean result = Boolean.FALSE;
     try {
       CreateIndexRequest request = new CreateIndexRequest(index);
       CreateIndexResponse createIndexResponse =
           client.indices().create(request, RequestOptions.DEFAULT);
       if (createIndexResponse != null) {
-        result = createIndexResponse.isAcknowledged();
+       return createIndexResponse.isAcknowledged();
       }
     } catch (ElasticsearchException exception) {
       log.error(exception);
     } catch (IOException ioException) {
       log.error(ioException);
     }
-    return result;
+    return Boolean.FALSE;
   }
 
   private void getResponsePage(
@@ -291,10 +280,9 @@ public class ElasticClient {
   }
 
   public String[] getIndex(String index) throws IOException {
-    GetIndexResponse getIndexResponse;
     try {
       GetIndexRequest request = new GetIndexRequest(index);
-      getIndexResponse = client.indices().get(request, RequestOptions.DEFAULT);
+      GetIndexResponse getIndexResponse = client.indices().get(request, RequestOptions.DEFAULT);
       return getIndexResponse.getIndices();
     } catch (ElasticsearchException | IOException exception) {
       log.error(exception);
@@ -303,8 +291,8 @@ public class ElasticClient {
   }
 
   public Long count(String index, SearcherQuery searcherQuery) {
-    CountRequest countRequest = new CountRequest(index);
     try {
+      CountRequest countRequest = new CountRequest(index);
       if (searcherQuery != null) {
         countRequest.query(QueryBuilderUtil.getBooleanQueryBuilder(searcherQuery));
       } else {
