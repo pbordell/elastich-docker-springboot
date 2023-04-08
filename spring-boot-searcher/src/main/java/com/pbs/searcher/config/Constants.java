@@ -7,6 +7,9 @@ public final class Constants {
   public static final String HTTP = "http";
   public static final String HTTPS = "https";
 
+  public static final String DASH = "-";
+  public static final String EMPTY = "";
+
   private Constants() {
     throw new UnsupportedOperationException();
   }

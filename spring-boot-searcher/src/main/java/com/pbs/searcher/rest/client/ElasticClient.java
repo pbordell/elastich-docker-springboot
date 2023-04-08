@@ -2,6 +2,7 @@ package com.pbs.searcher.rest.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pbs.searcher.config.Constants;
 import com.pbs.searcher.rest.entity.Data;
 import com.pbs.searcher.rest.entity.ResponsePage;
 import com.pbs.searcher.rest.entity.ResponsePageScroll;
@@ -322,8 +323,8 @@ public class ElasticClient {
       searchSourceBuilder.from(offset == 1 ? 0 : (offset - 1) * limit);
     }
     if (null != sort && !sort.isEmpty()) {
-      if (sort.contains("-")) {
-        searchSourceBuilder.sort(sort.replace("-", ""), SortOrder.DESC);
+      if (sort.contains(Constants.DASH)) {
+        searchSourceBuilder.sort(sort.replace(Constants.DASH, Constants.EMPTY), SortOrder.DESC);
       } else {
         searchSourceBuilder.sort(sort, SortOrder.ASC);
       }
