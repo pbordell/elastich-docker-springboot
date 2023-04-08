@@ -1,5 +1,6 @@
-package com.pbs.searcher.util;
+package com.pbs.searcher.elasticQuery;
 
+import com.pbs.searcher.util.Operator;
 import lombok.Data;
 
 @Data

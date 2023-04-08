@@ -1,8 +1,8 @@
 elasticsearch:
-  port: 9200
-  host: localhost
-  user: ${ELASTIC_USER:}
-  password: ${ELASTIC_PASSWORD:}
+  port: ${ELASTIC_PORT:9200}
+  host: ${ELASTIC_HOST:localhost}
+  user: ${ELASTIC_USER:elastic}
+  password: ${ELASTIC_PASSWORD:octo}
   ssl: ${ELASTIC_SSL:false}
   client:
     timeout: 2500
