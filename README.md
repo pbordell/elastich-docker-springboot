@@ -1,9 +1,5 @@
 # Elastich Docker SpringBoot
 
-![Java](https://shields.io)
-![Docker](https://shields.io)
-![Elasticsearch](https://shields.io)
-
 Este proyecto proporciona una infraestructura contenedorizada para el ecosistema **ELK Stack (Elasticsearch, Logstash y Kibana)**, completamente integrada con una aplicación **Spring Boot** encargada de realizar búsquedas y consumir datos de manera eficiente.
 
 ## 🚀 Características y Arquitectura
@@ -63,6 +59,3 @@ Una vez inicializado el entorno, podrás acceder a los servicios en las siguient
 * **Kibana UI:** `http://localhost:5601`
 * **Spring Boot App:** `http://localhost:8080` (o el puerto configurado en el microservicio)
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo correspondiente para más detalles.
